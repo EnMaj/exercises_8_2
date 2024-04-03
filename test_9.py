@@ -1,23 +1,26 @@
 import json
 import xmljson
 import yaml
+import xmltodict
 
 def to_format(parametr = None):
     def to_json(func):
         def wrapped(*args, **kwargs):
-            result = json.dumps(func(*args, **kwargs))
             if parametr == 'xml':
-                result = xmljson.badgerfish.etree(result)
+                result = xmltodict.unparse(func(*args, **kwargs))
             elif parametr == 'yaml':
-                result = yaml.dump(result,allow_unicode=True)
+                result = yaml.dump(func(*args, **kwargs))
+            elif parametr == None or parametr == 'json':
+                result = json.dumps(func(*args, **kwargs))
             return result
         return wrapped
     return to_json
 
 
-@to_format('yaml')
+@to_format('xml')
 def json_format(parametr):
-    return {'data': parametr}
+    #return {'data': parametr}
+    return {"Response": {"TransactionId":"12345","ResultCode": "0","Fields": {"field1": {"name": "LegalCode","text": "4"}}}}
 
 print(json_format('a'))
 print(json_format(['a','b','c']))
